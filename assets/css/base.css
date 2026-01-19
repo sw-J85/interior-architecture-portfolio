@@ -33,3 +33,40 @@ a {
   font-size: 14px;
   color: #555;
 }
+
+
+
+
+/* =========================================
+   GLOBAL LEGAL BANNER (ADAPTIVE)
+   ========================================= */
+
+.legal-banner {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+
+  padding: 6px 12px;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+
+  color: #666;
+  background: rgba(15, 15, 15, 0.6);
+  backdrop-filter: blur(4px);
+
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* -----------------------------------------
+   LIGHT BACKGROUND COMPENSATION
+   ----------------------------------------- */
+
+/* body가 밝을 때 대비 보강 */
+body:not(.dark) .legal-banner {
+  color: #444;
+  background: rgba(255, 255, 255, 0.75);
+}
+

@@ -47,3 +47,85 @@ document.querySelectorAll('.copy-email').forEach(btn => {
   });
 });
 
+
+
+
+/* =========================================
+   IMAGE LIGHTBOX (OPEN / CLOSE)
+   ========================================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* -----------------------------------------
+     1. 썸네일 이미지 클릭 → 라이트박스 열기
+     ----------------------------------------- */
+  document.querySelectorAll('.zoom-img').forEach(img => {
+    img.addEventListener('click', (e) => {
+      e.stopPropagation(); // 부모 클릭 이벤트 방지
+
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox) return; // 라이트박스 없으면 중단
+
+      const lightboxImg = lightbox.querySelector('img');
+
+      // data-full에 지정한 원본 이미지로 교체
+      lightboxImg.src = img.dataset.full;
+
+      // 라이트박스 표시
+      lightbox.style.display = 'flex';
+    });
+  });
+
+  /* -----------------------------------------
+     2. 라이트박스 클릭 → 닫기
+     ----------------------------------------- */
+  const lightbox = document.getElementById('lightbox');
+
+  if (lightbox) {
+    lightbox.addEventListener('click', () => {
+      const lightboxImg = lightbox.querySelector('img');
+
+      // 라이트박스 숨김
+      lightbox.style.display = 'none';
+
+      // 이미지 초기화 (잔상 방지)
+      lightboxImg.src = '';
+    });
+  }
+
+});
+
+
+
+/* =========================================
+   PROJECT HERO IMAGE → LIGHTBOX
+   ========================================= */
+
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* -----------------------------------------
+     Hero 영역 클릭 시 원본 이미지 확대
+     ----------------------------------------- */
+  document.querySelectorAll('.zoom-hero').forEach(hero => {
+    hero.addEventListener('click', () => {
+
+      // 라이트박스 요소 확인
+      const lightbox = document.getElementById('lightbox');
+      if (!lightbox) return;
+
+      const lightboxImg = lightbox.querySelector('img');
+
+      // data-full에 지정된 원본 이미지 사용
+      lightboxImg.src = hero.dataset.full;
+
+      // 라이트박스 표시
+      lightbox.style.display = 'flex';
+    });
+  });
+
+});
+
+
+
+
+

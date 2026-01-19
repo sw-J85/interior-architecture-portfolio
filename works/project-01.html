@@ -27,9 +27,11 @@
   </section>
 
   <!-- HERO IMAGE -->
-  <section class="project-hero placeholder">
-    <!-- placeholder image -->
+  <section class="project-hero placeholder zoom-hero"
+          data-full="../assets/img/works/project_01/project_01_main.jpg">
+    <!-- CSS background-image 사용 -->
   </section>
+
 
   <!-- OVERVIEW -->
   <section class="project-section">
@@ -92,9 +94,24 @@
   <section class="project-section">
     <h2>Rendering</h2>
     <div class="image-grid">
-      <div class="image placeholder"></div>
-      <div class="image placeholder"></div>
-      <div class="image placeholder"></div>
+      <div class="image placeholder">
+        <img src="../assets/img/works/project_01/project_01_render_01.jpg"
+         data-full="../assets/img/works/project_01/project_01_render_01.jpg"
+         class="zoom-img"
+         alt="메인 렌더">
+      </div>
+      <div class="image placeholder">
+        <img src="../assets/img/works/project_01/project_01_render_02.jpg"
+         data-full="../assets/img/works/project_01/project_01_render_02.jpg"
+         class="zoom-img"
+         alt="서브 렌더">
+      </div>
+      <div class="image placeholder">
+        <img src="../assets/img/works/project_01/project_01_render_03.jpg"
+         data-full="../assets/img/works/project_01/project_01_render_03.jpg"
+         class="zoom-img"
+         alt="파사드 렌더">
+      </div>
     </div>
   </section>
 
@@ -110,9 +127,14 @@
 
 </main>
 
+ <div id="lightbox">
+    <img src="" alt="확대 이미지">
+ </div>
+ 
+
 
 <script src="../assets/js/common.js"></script>
 
-
+ 
 </body>
 </html>
