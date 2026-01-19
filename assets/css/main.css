@@ -1,0 +1,427 @@
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: Pretendard, sans-serif;
+}
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  padding: 0 40px;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+}
+
+.top-nav a {
+  color: #fff;
+  margin-right: 24px;
+  text-decoration: none;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.top-nav a.active {
+  opacity: 1;
+  border-bottom: 1px solid #fff;
+}
+
+.top-nav a:hover {
+  opacity: 1;
+}
+
+.panel {
+  min-height: 100vh;
+  padding: 70px 80px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden; /* 패널 경계 보호 */
+}
+
+.panel-inner {
+  width: 100%;
+}
+
+
+
+.panel-inner.experience {
+  overflow-y: auto;
+}
+
+
+
+
+/* panel--light / dark 가 배경을 담당 */
+.panel--light {
+  background: #f5f5f5;
+  color: #111;
+}
+
+.panel--dark {
+  background: #0f0f0f;
+  color: #fff;
+}
+
+
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center; /* ⭐ 핵심 */
+}
+
+.image.placeholder {
+  background: #ccc;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.image.placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+
+/* HOME PANEL */
+
+
+/* 내부 정렬 */
+.home-panel .panel-inner {
+  max-width: 960px;
+  padding: 0 24px;
+  text-align: left;
+}
+
+/* 메인 문장 */
+.home-title {
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+
+/* 보조 문장 */
+.home-sub {
+  font-size: 18px;
+  line-height: 1.6;
+  opacity: 0.75;
+  margin-bottom: 64px;
+}
+
+/* 스크롤 유도 */
+.home-scroll {
+  font-size: 14px;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+
+/* 스크롤 유도 버튼 */
+.home-scroll {
+  font-size: 14px;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* hover 시 */
+.home-scroll:hover {
+  opacity: 0.9;
+  transform: translateY(2px);
+}
+
+
+
+/* 모달 기본스타일 */
+
+.image-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.image-modal img {
+  max-width: 90%;
+  max-height: 90%;
+}
+
+
+
+/* ===============================
+   ABOUT PANEL : FINAL STABLE
+   =============================== */
+
+/* 패널은 최소 화면 높이만 보장 */
+#about .panel {
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ABOUT는 콘텐츠 높이 허용 */
+#about {
+  overflow: visible;
+}
+
+/* panel-inner는 흐름만 담당 */
+#about .panel-inner {
+  max-width: 1000px;
+  /* margin: 0 auto; */
+  /* padding: 64px 40px; */
+
+  /* min-height: 100vh;      */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;    /* 변경 (핵심) */
+}
+
+/* ===============================
+   BLOCK STRUCTURE
+   =============================== */
+
+.about-block {
+  width: 100%;
+}
+
+/* .about-block + .about-block {
+  margin-top: 72px; 
+} 정리된 인상의 핵심 */
+
+/* ===============================
+   INTRO
+   =============================== */
+
+.about-intro {
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #ccc;
+  padding-bottom: 30px;
+}
+
+/* ===============================
+   EXPERIENCE
+   =============================== */
+
+/* .experience-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 40px;
+  margin-top: 24px;
+} */
+
+/* EXPERIENCE : 세로 정렬 */
+.experience-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.exp-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* EXPERIENCE : title left / detail right */
+
+.exp-item {
+  height: 50px;
+  display: grid;
+  grid-template-columns: 160px 1fr; /* title | detail */
+  column-gap: 24px;
+  align-items: center;
+  padding-left: 28px; /* 기존 dot 위치 유지 */
+}
+
+/* 타이틀 */
+.exp-title {
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  position: relative;
+  font-weight: bold;
+}
+
+/* 기존 점 유지 */
+.exp-title::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  left: -28px;
+  top: 0.45em;
+}
+
+/* 디테일 */
+.exp-detail {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #bbb;
+}
+
+/* hover는 강조만 */
+.exp-item:hover .exp-title {
+  color: #fff;
+}
+
+.exp-item:hover .exp-detail {
+  color: #ddd;
+}
+
+
+/* 모바일 : 항상 열림 */
+@media (hover: none) {
+  .exp-item {
+    grid-template-rows: auto 1fr;
+  }
+}
+
+/* ===============================
+   SKILL
+   =============================== */
+
+.skill {
+  margin-top: 24px;
+}
+
+/* .skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 32px;
+  margin-top: 24px;
+} */
+
+/* SKILL : 세로 정렬 */
+.skill-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+
+/* ===============================
+   SKILL : TITLE LEFT / CONTENT RIGHT
+   =============================== */
+
+.skill-group {
+  height: 50px;
+  display: grid;
+  grid-template-columns: 140px 1fr; /* h3 | p */
+  column-gap: 24px;
+  align-items: center;
+}
+
+.skill-group h3 {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.skill-group p {
+  font-size: 11px;
+  line-height: 1.45;
+  color: #bbb;
+}
+
+
+
+
+/* ===============================
+   GRID 침범 방지 (핵심)
+   =============================== */
+
+.about-layout > *,
+.experience-grid > *,
+.skill-grid > * {
+  min-width: 0;
+}
+
+/* ===============================
+   TABLET
+   =============================== */
+
+@media (max-width: 1024px) {
+  #about .panel-inner {
+    padding: 56px 32px;
+  }
+
+  .experience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skill-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===============================
+   MOBILE
+   =============================== */
+
+@media (max-width: 768px) {
+  #about .panel-inner {
+    padding: 48px 24px;
+  }
+
+  .about-block + .about-block {
+    margin-top: 56px;
+  }
+}
+
+/* ===============================
+   ABOUT MAIN GRID (핵심)
+   =============================== */
+
+.about-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 좌 Experience / 우 Skill */
+  /* gap: 64px; */
+  align-items: start;
+}
+
+/* 태블릿 이하: 세로 스택 */
+@media (max-width: 1024px) {
+  .about-main-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+

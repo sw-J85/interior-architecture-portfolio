@@ -1,0 +1,151 @@
+
+
+.page-header {
+  padding: 24px 40px;
+}
+
+.back-link {
+  text-decoration: none;
+  font-size: 14px;
+  color: #555;
+}
+
+
+/* process */
+
+.process {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.process-intro h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.process-intro .lead {
+  font-size: 18px;
+  line-height: 1.6;
+  margin-bottom: 64px;
+}
+
+.process-section {
+  margin-bottom: 80px;
+}
+
+.process-section h2 {
+  font-size: 22px;
+  margin-bottom: 24px;
+}
+
+.process-flow {
+  list-style: none;
+  padding: 0;
+}
+
+.process-flow li {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.step {
+  font-weight: bold;
+  font-size: 14px;
+  color: #888;
+  min-width: 32px;
+}
+
+.criteria-list {
+  list-style: disc;
+  padding-left: 20px;
+}
+
+.criteria-list li {
+  margin-bottom: 12px;
+}
+
+
+/* Works list */
+
+.works-list {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.works-intro {
+  margin-bottom: 64px;
+}
+
+.projects {
+  display: grid;
+  gap: 48px;
+}
+
+.project-item h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.project-desc {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+/* work_project css */
+
+.project {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.project-intro {
+  margin-bottom: 64px;
+}
+
+.project-hero {
+  aspect-ratio: 16 / 9;
+  background: #ccc;
+  margin-bottom: 64px;
+}
+
+.project-section {
+  margin-bottom: 64px;
+}
+
+.project-section h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.project-meta li {
+  margin-bottom: 8px;
+}
+
+.image-row {
+  display: flex;
+  gap: 24px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.image {
+  aspect-ratio: 4 / 3;
+  background: #ddd;
+}
+
+.caption {
+  font-size: 14px;
+  color: #666;
+  margin-top: 8px;
+}
+
