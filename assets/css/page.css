@@ -11,7 +11,163 @@
 }
 
 
-/* process */
+/* 브랜드,프로세스 섹션 상단 바 */
+
+.brand-section,
+.process-section {
+  position: relative;
+}
+
+.brand-section::before,
+.process-section::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  margin-bottom: 24px;
+}
+
+
+
+
+
+
+/* ===============================
+   BRAND PAGE
+   =============================== */
+
+   
+/* BRAND PAGE FULL DARK */
+body {
+  background: #0f1115;
+}
+
+
+.brand {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 140px 24px 160px;
+  /* background: #0f1115;
+  color: #cfcfcf; */
+}
+
+/* ===============================
+   BRAND INTRO
+   =============================== */
+
+.brand-intro {
+  margin-bottom: 120px;
+  /* padding-bottom: 80px; */
+
+}
+
+.brand-intro h1 {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.01em; /* 과한 자간 조임 */
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+
+.brand-intro .lead {
+  font-size: 18px;
+  line-height: 1.6;
+  max-width: 640px;
+  color: #bdbdbd;
+}
+
+/* ===============================
+   BRAND SECTION COMMON
+   =============================== */
+
+.brand-section {
+  margin-bottom: 96px;
+}
+
+.brand-section h2 {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.02em; /* 0.06 → 완화 */
+  margin-bottom: 24px;
+  color: #ffffff;
+}
+
+.brand-section p {
+  font-size: 15px;
+  line-height: 1.7; /* 1.8 → 가독성 개선 */
+  max-width: 720px;
+  color: #cfcfcf;
+}
+
+/* ===============================
+   BRAND LIST (PHILOSOPHY)
+   =============================== */
+
+.brand-section ul {
+  padding-left: 20px;
+  max-width: 720px;
+}
+
+.brand-section li {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+  color: #cfcfcf;
+}
+
+/* ===============================
+   HEADER (BRAND PAGE)
+   =============================== */
+
+.page-header {
+  background: rgba(15, 17, 21, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.back-link {
+  font-size: 14px;
+  color: #aaa;
+}
+
+.back-link:hover {
+  color: #ffffff;
+}
+
+/* ===============================
+   BRAND RESPONSIVE
+   =============================== */
+
+@media (max-width: 768px) {
+  .brand {
+    padding: 120px 20px 140px;
+  }
+
+  .brand-intro h1 {
+    font-size: 36px;
+  }
+
+  .brand-intro .lead {
+    font-size: 16px;
+  }
+
+  .brand-section h2 {
+    font-size: 18px;
+  }
+
+  .brand-section p,
+  .brand-section li {
+    font-size: 14px;
+  }
+}
+
+
+
+
+
+/* ===============================
+   PROCESS PAGE
+   =============================== */
 
 .process {
   max-width: 960px;
@@ -67,52 +223,77 @@
 }
 
 
-/* Works list */
+/* ===============================
+   WORKS LIST PAGE (DARK)
+   =============================== */
 
 .works-list {
   max-width: 960px;
   margin: 0 auto;
-  padding: 40px;
+  padding: 80px 24px 120px;
+  color: #cfcfcf;
 }
 
 .works-intro {
   margin-bottom: 64px;
 }
 
+.works-intro h1,
+.works-intro h2 {
+  color: #ffffff;
+}
+
 .projects {
   display: grid;
-  gap: 48px;
+  gap: 56px;
 }
 
 .project-item h2 {
   font-size: 22px;
   margin-bottom: 8px;
+  color: #ffffff;
 }
 
 .project-desc {
   font-size: 15px;
-  line-height: 1.5;
+  line-height: 1.6;
   margin-bottom: 12px;
-  color: #555;
+  color: #a9a9a9;
 }
 
-/* work_project css */
+
+/* ===============================
+   WORK DETAIL PAGE (DARK)
+   =============================== */
 
 .project {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 40px;
+  padding: 120px 24px 160px;
+  color: #cfcfcf;
 }
 
 .project-intro {
   margin-bottom: 64px;
 }
 
+.project h1,
+.project h2,
+.project h3 {
+  color: #ffffff;
+}
+
+
 .project-hero {
   aspect-ratio: 16 / 9;
-  background: #ccc;
+  /* background: #1a1d24; 다크 톤 이미지 배경 */
+  background-image: url("../img/works/project_01/project_01_main.png");
+  background-size: cover;
+  background-position: center;
   margin-bottom: 64px;
 }
+
+
 
 .project-section {
   margin-bottom: 64px;
@@ -123,9 +304,22 @@
   margin-bottom: 16px;
 }
 
+.project-section p {
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 760px;
+  color: #cfcfcf;
+}
+
 .project-meta li {
   margin-bottom: 8px;
+  color: #a9a9a9;
 }
+
+
+/* ===============================
+   IMAGE GROUPS
+   =============================== */
 
 .image-row {
   display: flex;
@@ -140,12 +334,86 @@
 
 .image {
   aspect-ratio: 4 / 3;
-  background: #ddd;
+  background: #1a1d24;
 }
+
+
+/* ===============================
+   CAPTION
+   =============================== */
 
 .caption {
   font-size: 14px;
-  color: #666;
+  color: #9a9a9a;
   margin-top: 8px;
 }
+
+
+/* ===============================
+   WORK RESPONSIVE
+   =============================== */
+
+@media (max-width: 768px) {
+  .works-list,
+  .project {
+    padding: 80px 20px 120px;
+  }
+
+  .project-item h2,
+  .project-section h2 {
+    font-size: 20px;
+  }
+
+  .project-desc,
+  .project-section p {
+    font-size: 14px;
+  }
+
+  .image-row {
+    flex-direction: column;
+  }
+
+  .image-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ===============================
+   PROCESS PAGE (DARK)
+   =============================== */
+
+.process {
+  color: #cfcfcf;
+}
+
+.process h1,
+.process h2,
+.process h3 {
+  color: #ffffff;
+}
+
+.process .lead,
+.process p,
+.process li {
+  color: #cfcfcf;
+}
+
+.process .step {
+  color: #9a9a9a;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+
+.process .criteria-list li {
+  color: #cfcfcf;
+}
+
+
+
+
+
+
 

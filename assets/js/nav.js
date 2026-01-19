@@ -1,36 +1,62 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const navLinks = document.querySelectorAll('.top-nav a');
-  const panels = document.querySelectorAll('.panel');
+// document.addEventListener("DOMContentLoaded", () => {
+//   const navLinks = document.querySelectorAll(".top-nav a");
+//   const sections = Array.from(navLinks)
+//     .map(link => document.querySelector(link.getAttribute("href")))
+//     .filter(Boolean);
 
-  // nav 클릭 → 해당 섹션으로 이동
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
+//   navLinks.forEach((link, i) => {
+//     link.addEventListener("click", e => {
+//       e.preventDefault();
+//       if (window.__HIVEWORKS_MOVE_TO__) {
+//         window.__HIVEWORKS_MOVE_TO__(i);
+//       }
+//     });
+//   });
+
+//   // active 표시 (index 기준)
+//   function updateActive(i) {
+//     navLinks.forEach((link, idx) => {
+//       link.classList.toggle("active", idx === i);
+//     });
+//   }
+
+//   // scroll.js와 동기화
+//   let currentIndex = 0;
+//   window.addEventListener("scroll", () => {
+//     sections.forEach((section, i) => {
+//       if (window.scrollY >= section.offsetTop - 100) {
+//         currentIndex = i;
+//       }
+//     });
+//     updateActive(currentIndex);
+//   });
+
+//   updateActive(0);
+// });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const navLinks = document.querySelectorAll(".top-nav a");
+
+  function updateActive(i) {
+    navLinks.forEach((link, idx) => {
+      link.classList.toggle("active", idx === i);
+    });
+  }
+
+  // nav 클릭 → index 이동
+  navLinks.forEach((link, i) => {
+    link.addEventListener("click", e => {
       e.preventDefault();
-      const targetId = link.getAttribute('href');
-      const target = document.querySelector(targetId);
-      if (!target) return;
-
-      target.scrollIntoView({ behavior: 'smooth' });
+      if (window.__HIVEWORKS_MOVE_TO__) {
+        window.__HIVEWORKS_MOVE_TO__(i);
+        updateActive(i); // 🔥 즉시 반영
+      }
     });
   });
 
-  // 현재 섹션에 맞는 nav 활성화
-  function updateActiveNav() {
-    let currentIndex = 0;
+  // scroll.js가 현재 index를 알려줄 수 있도록 훅 준비
+  window.__HIVEWORKS_UPDATE_NAV__ = updateActive;
 
-    panels.forEach((panel, index) => {
-      const rect = panel.getBoundingClientRect();
-      if (rect.top <= window.innerHeight / 2) {
-        currentIndex = index;
-      }
-    });
-
-    navLinks.forEach(link => link.classList.remove('active'));
-    if (navLinks[currentIndex]) {
-      navLinks[currentIndex].classList.add('active');
-    }
-  }
-
-  window.addEventListener('scroll', updateActiveNav);
-  updateActiveNav();
+  updateActive(0);
 });
