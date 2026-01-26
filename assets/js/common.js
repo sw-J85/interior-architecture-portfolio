@@ -126,6 +126,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+// 푸터 하단
+ document.getElementById('copyright-year').textContent = new Date().getFullYear();
 
 
 
