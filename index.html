@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HIVEWORKS | 실내건축 설계 및 시공 실무</title>
+
+  <!-- Font (avoid @import for faster render) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Libraries (must be inside <head>) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    // Tailwind config
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#facc15', dark: '#eab308' },
+            secondary: { DEFAULT: '#d8b4fe', light: '#f3e8ff', soft: 'rgba(216, 180, 254, 0.2)' },
+            navy: { 900: '#0f172a', 950: '#020617' },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Pretendard', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.6s ease-out;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Tailwind CDN 환경에서 line-clamp 플러그인이 미적용일 수 있어 안전하게 CSS로 보완 */
+    .clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    #slider-viewport {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .work-card {
+      position: absolute;
+      width: 340px;
+      height: 520px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+      background: white;
+      z-index: 1;
+      opacity: 0;
+      pointer-events: none;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dark .work-card {
+      border-color: #1e293b;
+      background: #1e293b;
+    }
+
+    .work-card.active {
+      opacity: 1;
+      transform: scale(1.1) translateX(0);
+      z-index: 10;
+      pointer-events: auto;
+      border-color: #facc15;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .work-card.prev {
+      opacity: 0.4;
+      transform: scale(0.85) translateX(-380px);
+      filter: blur(2px);
+      z-index: 5;
+    }
+
+    .work-card.next {
+      opacity: 0.4;
+      transform: scale(0.85) translateX(380px);
+      filter: blur(2px);
+      z-index: 5;
+    }
+
+    .image-placeholder {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    }
+
+    .dark .image-placeholder {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    .modal-overlay {
+      background: rgba(2, 6, 23, 0.9);
+      backdrop-filter: blur(10px);
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* Lightbox overlay for image zoom */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 6, 23, 0.95);
+      backdrop-filter: blur(6px);
+      padding: 24px;
+    }
+
+    .lightbox-overlay img {
+      max-width: 95vw;
+      max-height: 95vh;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    }
+
+    .slider-controls-wrapper {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 880px;
+      max-width: 95vw;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .slider-control {
+      background: white;
+      color: #1a1a1a;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .dark .slider-control {
+      background: #1e293b;
+      color: #facc15;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .slider-control:hover {
+      transform: scale(1.15);
+      background: #facc15;
+      color: #0f172a;
+    }
+  </style>
+</head>
+
+<body class="bg-white text-slate-900 dark:bg-navy-950 dark:text-slate-100 selection:bg-primary/30">
+  <div id="top"></div>
+
+  <!-- Navigation -->
+  <nav
+    class="fixed top-0 w-full z-50 px-6 py-4 border-b border-gray-100 dark:border-navy-900 bg-white/80 dark:bg-navy-950/80 backdrop-blur-md flex justify-between items-center"
+  >
+    <a href="#top" class="font-bold tracking-tighter text-xl text-slate-900 dark:text-white"
+      >HIVE<span class="text-primary">WORKS</span></a
+    >
+
+    <div class="flex items-center gap-6">
+      <div class="hidden md:flex gap-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+        <a href="#about" class="hover:text-primary transition-colors">소개</a>
+        <a href="#experience" class="hover:text-primary transition-colors">경력 및 역량</a>
+        <a href="#works" class="hover:text-primary transition-colors">포트폴리오</a>
+      </div>
+
+      <button
+        id="dark-mode-toggle"
+        aria-label="다크 모드 토글"
+        class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-navy-900 transition-colors"
+      >
+        <i data-lucide="moon" class="w-5 h-5 dark:hidden text-navy-900"></i>
+        <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-primary"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="pt-48 pb-32 px-6 max-w-5xl mx-auto">
+    <div
+      class="reveal mb-6 inline-flex items-center gap-2 px-3 py-1 bg-primary/10 dark:bg-primary/20 text-primary-dark dark:text-primary rounded-full text-xs font-bold uppercase mono tracking-widest transition-colors"
+    >
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+      </span>
+      Late Bloomer, High Potential
+    </div>
+
+    <h1
+      class="reveal text-5xl md:text-7xl font-bold mb-10 tracking-tight leading-[1.1] text-slate-900 dark:text-white transition-colors"
+    >
+      경험의 폭을, <br />공간의 완성도로.<br><span class="text-primary">HIVEWORKS</span>
+    </h1>
+
+    <p
+      class="reveal text-slate-600 dark:text-slate-400 text-xl md:text-2xl max-w-3xl font-light leading-relaxed transition-colors"
+    >
+      제작과 품질, 현장을 거친 실무 경험을  <br class="hidden md:block" />
+      이제 실내건축이라는 하나의 방향으로 집중합니다. <br class="hidden md:block" />
+      속도보다 <span class="text-secondary dark:text-secondary font-semibold">기준</span>을, 겉모습보다 <span class="text-secondary dark:text-secondary font-semibold">완성도</span>를 선택합니다.
+    </p>
+  </section>
+
+  <!-- Detailed About -->
+  <section id="about" class="py-24 bg-slate-50 dark:bg-navy-900/50 px-6">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+        <div class="reveal space-y-6">
+          <h2 class="text-3xl font-bold">건축 현장의 흐름을 <br />몸으로 익혔습니다.</h2>
+          <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+            엘리베이터 설치 실무를 통해 건축 현장의 흐름과 공정의 밀도를 직접 체감했습니다.도면은 종이 위에 머무는 것이 아니라 현장에서 해석되고 조율되며 완성됩니다. 그 경험은 지금,설계의 기준을 세우는 바탕이 되고 있습니다
+          </p>
+          <div class="flex gap-4">
+            <div class="p-4 bg-white dark:bg-navy-900 rounded-xl border border-slate-100 dark:border-navy-800 flex-1">
+              <span class="block text-primary font-bold text-xl mb-1">8Y 4M</span>
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider">Total Career</span>
+            </div>
+            <div class="p-4 bg-white dark:bg-navy-900 rounded-xl border border-slate-100 dark:border-navy-800 flex-1">
+              <span class="block text-secondary font-bold text-xl mb-1">10+</span>
+              <span class="text-[10px] text-slate-400 uppercase tracking-wider">Professional Certs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal space-y-8" style="transition-delay: 0.2s">
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <i data-lucide="check-circle-2" class="w-5 h-5 text-primary"></i> 업무 철학
+            </h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              무작정 속도를 내기보다 업무의 목적과 기준을 먼저 정리합니다. 전체 흐름을 파악한 뒤 집중도를 높이며,
+              처음에는 시간이 걸리더라도 같은 실수를 반복하지 않도록 기준을 세우는 방식을 선호합니다. 툴은 수단일
+              뿐이며, 작업의 본질에 맞는 해결책을 찾아 실천합니다.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold flex items-center gap-2">
+              <i data-lucide="cpu" class="w-5 h-5 text-secondary"></i> 보유 역량
+            </h3>
+            <div class="grid grid-cols-2 gap-3 text-xs">
+              <div class="px-3 py-2 bg-slate-200/50 dark:bg-navy-800 rounded-lg">CAD / SketchUp / 3ds Max</div>
+              <div class="px-3 py-2 bg-slate-200/50 dark:bg-navy-800 rounded-lg">Photoshop / Illustrator</div>
+              <div class="px-3 py-2 bg-slate-200/50 dark:bg-navy-800 rounded-lg">측색 및 색채 관리</div>
+              <div class="px-3 py-2 bg-slate-200/50 dark:bg-navy-800 rounded-lg">3D CLO / 3D Printing</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience & Education & Certs -->
+  <section id="experience" class="py-32 px-6 bg-white dark:bg-navy-950 transition-colors">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+        <!-- Left Column: Education & Certificates -->
+        <div class="lg:col-span-4 space-y-16">
+          <!-- Education -->
+          <div class="reveal">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><span class="w-8 h-1 bg-primary"></span> Education</h2>
+            <div class="space-y-8">
+              <div>
+                <div class="text-[10px] font-bold text-secondary mono mb-1">2016. 09 - 2019. 02</div>
+                <h4 class="font-bold text-slate-900 dark:text-white">서울사이버대학교</h4>
+                <p class="text-xs text-slate-500 dark:text-slate-400">멀티미디어디자인학과 (편입 졸업)</p>
+                <p class="text-xs text-primary-dark dark:text-primary mt-1 font-bold">학점 3.96 / 4.5</p>
+              </div>
+              <div>
+                <div class="text-[10px] font-bold text-secondary mono mb-1">2004. 03 - 2008. 02</div>
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">서일대학 민족문화 졸업</h4>
+              </div>
+            </div>
+          </div>
+
+          <!-- Certificates -->
+          <div class="reveal">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-3"><span class="w-8 h-1 bg-primary"></span> Certificates</h2>
+            <div class="space-y-6">
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">실내건축기사</h4>
+                <p class="text-[10px] text-slate-400 mono">2025. 12 | 한국산업인력공단</p>
+              </div>
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-primary before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">멀티미디어콘텐츠제작전문가</h4>
+                <p class="text-[10px] text-slate-400 mono">2025. 06 | 한국산업인력공단</p>
+              </div>
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-slate-300 before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">웹디자인개발기능사</h4>
+                <p class="text-[10px] text-slate-400 mono">2025. 04 | 한국산업인력공단</p>
+              </div>
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-slate-300 before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">3D프린터운용기능사</h4>
+                <p class="text-[10px] text-slate-400 mono">2024. 09 | 한국산업인력공단</p>
+              </div>
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-slate-300 before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">컬러리스트기사</h4>
+                <p class="text-[10px] text-slate-400 mono">2023. 09 | 한국산업인력공단</p>
+              </div>
+              <div class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-slate-300 before:rounded-full">
+                <h4 class="font-bold text-slate-900 dark:text-white text-sm">컴퓨터그래픽스운용기능사</h4>
+                <p class="text-[10px] text-slate-400 mono">2023. 04 | 한국산업인력공단</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 dark:border-navy-900">
+                <p class="text-[10px] text-slate-400 leading-relaxed">기타: GTQid 1급, GTQi 1급, GTQ 1급, 컴퓨터활용능력 2급, 워드프로세서, MOS 등 다수 보유</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Experience -->
+        <div class="lg:col-span-8 space-y-12">
+          <div class="reveal">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+              <span class="w-8 h-1 bg-primary"></span> Experience
+              <span class="ml-auto text-xs font-normal text-slate-400 mono">Total: 8Y 4M</span>
+            </h2>
+            <div class="space-y-6" id="experience-list"><!-- JS injected --></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Selected Works (Slider) -->
+  <section id="works" class="py-32 overflow-hidden bg-slate-50 dark:bg-navy-900/30">
+    <div class="reveal max-w-5xl mx-auto px-6 mb-12 text-center md:text-left">
+      <h2 class="text-3xl font-bold mb-2 text-slate-900 dark:text-white">Standard-Driven Projects</h2>
+      <p class="text-slate-500 dark:text-slate-400 text-sm">기준을 세우고, 완성도로 연결한 프로젝트 기록입니다.</p>
+    </div>
+
+    <div class="relative w-full">
+      <div id="slider-viewport"></div>
+      <div class="slider-controls-wrapper">
+        <button onclick="slidePrev()" aria-label="이전 프로젝트" class="slider-control">
+          <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </button>
+        <button onclick="slideNext()" aria-label="다음 프로젝트" class="slider-control">
+          <i data-lucide="chevron-right" class="w-6 h-6"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact" class="pt-32 pb-16 px-6 max-w-5xl mx-auto border-t border-slate-100 dark:border-navy-900">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
+      <div class="reveal">
+        <h2 class="text-4xl font-bold mb-8">Ready to <br /><span class="text-primary text-5xl">Contribute.</span></h2>
+        <p class="text-slate-500 dark:text-slate-400 font-light text-lg leading-relaxed">
+          현장을 이해하고, <br />기준을 세워 설계합니다.<br>이제 실무에서 완성도로 증명하겠습니다.
+        </p>
+      </div>
+      <div class="reveal flex flex-col justify-end space-y-6">
+        <div class="group cursor-pointer">
+          <span class="block text-[10px] uppercase tracking-widest text-secondary dark:text-secondary font-bold mb-1">Email</span>
+          <a href="mailto:rupit85@gmail.com" class="text-2xl font-medium group-hover:text-primary transition-colors">rupit85@gmail.com</a>
+        </div>
+        <div class="group cursor-pointer">
+          <span class="block text-[10px] uppercase tracking-widest text-secondary dark:text-secondary font-bold mb-1">Mobile</span>
+          <span class="text-2xl font-medium">010.9259.****</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal pt-16 border-t border-slate-100 dark:border-navy-900 flex justify-between items-center text-[10px] text-slate-400 uppercase mono tracking-widest">
+      <span>&copy; 2026 HIVEWORKS</span>
+      <span>Based in South Korea</span>
+    </div>
+  </footer>
+
+  <!-- Modal -->
+  <div id="project-modal" class="modal-overlay" onclick="closeModal()" role="dialog" aria-modal="true" aria-label="프로젝트 상세">
+    <div
+      class="bg-white dark:bg-navy-900 max-w-4xl w-full rounded-3xl p-8 md:p-12 relative shadow-2xl overflow-y-auto max-h-[90vh]"
+      onclick="event.stopPropagation()"
+    >
+      <button onclick="closeModal()" aria-label="모달 닫기" class="absolute top-8 right-8 text-slate-400 hover:text-primary transition-colors">
+        <i data-lucide="x" class="w-8 h-8"></i>
+      </button>
+      <div id="modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div id="lightbox" class="lightbox-overlay" onclick="closeLightbox()" aria-label="이미지 확대 보기">
+    <img id="lightbox-img" src="" alt="확대 이미지" />
+  </div>
+
+  <script>
+    // =========================
+    // Data
+    // =========================
+    const works = [
+      {
+        id: 'w1',
+        title: 'HIVEWORKS Shared Office & Cafe',
+        category: 'Commercial Interior Design',
+        desc: '실내건축기사 과정평가형 프로젝트. 공유오피스와 카페를 결합한 상업공간 설계.',
+        tags: ['AutoCAD', '3ds Max', 'Commercial Space', '1인 총괄 작업'],
+        content: 
+          '공유오피스와 카페 기능을 결합한 복합 상업공간을 기획·설계했습니다. 공간 프로그램 구성, 동선 계획, 마감재 선정 및 도면 작업을 수행했으며, 3ds Max를 활용해 공간 분위기와 재질감을 시각화했습니다. 설계 의도가 도면과 렌더링에서 일관되게 전달되도록 정합성을 중점적으로 관리했습니다.',
+      },
+      {
+        id: 'w2',
+        title: 'Residential Furniture Access Verification',
+        category: 'Residential Planning & Simulation',
+        desc: '실측 데이터 기반 신축 주거 공간 가구 반입 검증 및 동선 시뮬레이션.',
+        tags: ['SketchUp', 'Layout', 'AI Rendering', 'Space Simulation'],
+        content: 
+          '실측 데이터를 기반으로 가구 반입 가능 여부와 내부 동선을 검증했습니다. 출입구, 복도 폭, 회전 반경 등을 고려해 반입 경로를 시뮬레이션하고, 가구 배치 후 생활 동선의 효율성을 분석했습니다. SketchUp과 Layout을 활용해 도면화하고, AI 렌더링으로 실제 공간감을 보완했습니다.',
+      },
+      {
+        id: 'w3',
+        title: 'Multi-Family Housing Exterior Design',
+        category: 'Architectural Concept & Color Strategy',
+        desc: '공동주택 외부 특화 디자인 및 색채 전략 수립.',
+        tags: ['SketchUp', 'AI Rendering', 'Color Strategy', 'Facade Design'],
+        content:
+          '공동주택 외관 매스 디자인과 색채 구성을 기획했습니다. 단순한 색상 조합이 아닌, 명도·채도 대비와 비율(20/60/20 원칙)을 고려해 파사드 구성을 정리했습니다. 자동차 내장재 측색 경험을 바탕으로, 조명 환경에 따른 색상 인지 차이를 고려한 색채 전략을 적용했습니다.',
+      },
+    ];
+
+    const experiences = [
+      {
+        title: '주식회사 컬러테크',
+        role: '자동차 부품 측색 및 데이터 관리',
+        period: '2023. 09 - 2025. 02',
+        detail:
+          '자동차 내·외장 부품 색상 측정 및 데이터 편집 담당. 측색 기준 정립을 통해 데이터 오류를 방지하고 반복 작업의 정확도를 유지함.',
+      },
+      {
+        title: '애플라인드스포츠 주식회사',
+        role: '브랜드·제품 디자인 실무',
+        period: '2021. 11 - 2022. 11',
+        detail: '스포츠웨어 제품 디자인 및 시안 제작. 브랜드 아이덴티티 시각화 및 디자인 기준 정립을 통해 공정 효율을 높임.',
+      },
+      {
+        title: '디티피월드(DTPWORLD)',
+        role: '축구 유니폼 제조·그래픽 실무',
+        period: '2020. 01 - 2021. 11',
+        detail: '유니폼 그래픽 시안 및 출력 데이터 관리. 원단/색상별 작업 사양을 정리하여 디자인 의도와 실제 결과물의 간극을 조율함.',
+      },
+      
+      {
+        title: '주식회사 중화무역',
+        role: '나라장터 입찰 및 판촉물 시안 작업',
+        period: '2017. 11 - 2018. 07',
+        detail: '입찰 자료 정리 및 시각 자료 제작. 공공기관 제안 프로세스와 업무 흐름을 경험함.',
+      },
+      {
+        title: '메리트가구 / (주)리빙앤에프',
+        role: '온라인마케터 / 가구 실무',
+        period: '2015. 02 - 2017. 04',
+        detail: '가구 제품 특성 및 공간 적용 이해. 온라인 유통 환경에서의 효과적인 제품 정보 전달 체계 구축.',
+      },
+      {
+        title: '(주)타라그래픽스',
+        role: '디지털 출력 및 시각물 제작',
+        period: '2011. 05 - 2012. 03',
+        detail: '디지털 출력물 제작 관리 및 디자인 파일 최적화. 제작 사양과 품질 관리를 위한 실무 경험 확보.',
+      },
+      {
+        title: '엘리베이터 설치 및 시공',
+        role: '현장 시공 실무',
+        period: '2008. 09 - 2009. 05',
+        detail: '약 1년간 엘리베이터 설치 업무 수행. 건축 현장의 흐름과 안전, 협업의 중요성을 직접 체득하며 도면의 현장 적용 과정을 경험함.',
+      },
+    ];
+
+    // =========================
+    // Utilities
+    // =========================
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function makePlaceholderDataUrl(text) {
+      const safeText = escapeHtml(text);
+      const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <rect width="100%" height="100%" fill="#e5e7eb"/>
+  <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#6b7280" font-size="20">${safeText}</text>
+</svg>`;
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function handleImgError(imgEl, workId) {
+      if (!imgEl) return;
+      const tries = [`assets/works/${workId}/01.jpg`, `assets/works/${workId}/01.png`, `assets/works/${workId}/01.webp`];
+      const idx = Number(imgEl.dataset.tryIndex || '0');
+
+      if (idx < tries.length) {
+        imgEl.dataset.tryIndex = String(idx + 1);
+        imgEl.onerror = () => handleImgError(imgEl, workId);
+        imgEl.src = tries[idx];
+        return;
+      }
+
+      imgEl.onerror = null;
+      imgEl.src = makePlaceholderDataUrl(`이미지 업로드: assets/works/${workId}/01.jpg (또는 01.png / 01.webp)`);
+    }
+
+    async function loadFirstExistingImage(urls) {
+      for (const url of urls) {
+        // eslint-disable-next-line no-await-in-loop
+        const ok = await new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve(true);
+          img.onerror = () => resolve(false);
+          img.src = url;
+        });
+        if (ok) return url;
+      }
+      return null;
+    }
+
+    function applyInitialTheme() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        document.documentElement.classList.add('dark');
+        return;
+      }
+      if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+        return;
+      }
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.classList.toggle('dark', prefersDark);
+    }
+
+    // =========================
+    // Slider
+    // =========================
+    let currentIndex = 0;
+
+    function updateSlider() {
+      const viewport = document.getElementById('slider-viewport');
+      if (!viewport) return;
+      viewport.innerHTML = '';
+
+      works.forEach((work, index) => {
+        const card = document.createElement('div');
+        card.className = 'work-card rounded-3xl overflow-hidden shadow-lg';
+
+        if (index === currentIndex) card.classList.add('active');
+        else if (index === (currentIndex - 1 + works.length) % works.length) card.classList.add('prev');
+        else if (index === (currentIndex + 1) % works.length) card.classList.add('next');
+
+        card.addEventListener('click', () => {
+          if (index === currentIndex) openModal(work.id);
+        });
+
+        card.innerHTML = `
+          <div class="shrink-0 aspect-[16/10] overflow-hidden image-placeholder">
+            <img
+              src="assets/works/${work.id}/01.jpg"
+              alt="${escapeHtml(work.title)} 대표 이미지"
+              class="w-full h-full object-cover"
+              onerror="handleImgError(this, '${work.id}')"
+            />
+          </div>
+          <div class="p-8 flex-grow flex flex-col">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-2 h-2 rounded-full bg-primary"></span>
+              <span class="text-[11px] font-bold text-primary-dark dark:text-primary uppercase mono tracking-widest">${escapeHtml(work.category)}</span>
+            </div>
+            <h3 class="text-xl font-bold mb-3 text-slate-900 dark:text-white leading-tight min-h-[3.5rem]">${escapeHtml(work.title)}</h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 leading-relaxed clamp-3">${escapeHtml(work.desc)}</p>
+            <div class="mt-auto flex flex-wrap gap-2">
+              ${work.tags
+                .map(
+                  (tag) =>
+                    `<span class="px-3 py-1 bg-slate-100 dark:bg-navy-900 text-[10px] text-slate-500 dark:text-slate-400 rounded-lg">#${escapeHtml(tag)}</span>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `;
+
+        viewport.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    window.slideNext = () => {
+      currentIndex = (currentIndex + 1) % works.length;
+      updateSlider();
+    };
+
+    window.slidePrev = () => {
+      currentIndex = (currentIndex - 1 + works.length) % works.length;
+      updateSlider();
+    };
+
+    // =========================
+    // Experience
+    // =========================
+    function renderExperience() {
+      const expList = document.getElementById('experience-list');
+      if (!expList) return;
+
+      expList.innerHTML = experiences
+        .map(
+          (exp) => `
+            <div class="reveal group p-6 rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-navy-900 hover:bg-slate-50/50 dark:hover:bg-navy-900/30 transition-all">
+              <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div class="space-y-1">
+                  <div class="text-[10px] font-bold text-secondary dark:text-secondary mono uppercase tracking-wider">${escapeHtml(exp.period)}</div>
+                  <h3 class="text-lg font-bold text-slate-900 dark:text-white group-hover:text-primary transition-colors">${escapeHtml(exp.title)}</h3>
+                  <div class="text-sm font-medium text-slate-400">${escapeHtml(exp.role)}</div>
+                </div>
+                <div class="md:max-w-sm border-l border-slate-200 dark:border-navy-800 pl-4 py-1">
+                  <p class="text-slate-500 dark:text-slate-400 text-xs font-light leading-relaxed">${escapeHtml(exp.detail)}</p>
+                </div>
+              </div>
+            </div>
+          `
+        )
+        .join('');
+    }
+
+    // =========================
+    // Lightbox
+    // =========================
+    function openLightbox(src) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      if (!lb || !img) return;
+      img.src = src;
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      if (!lb || !img) return;
+      lb.style.display = 'none';
+      img.src = '';
+      // NOTE: If modal is open, keep body locked.
+      const modal = document.getElementById('project-modal');
+      const modalOpen = modal && modal.style.display === 'flex';
+      document.body.style.overflow = modalOpen ? 'hidden' : 'auto';
+    }
+
+    // =========================
+    // Modal
+    // =========================
+    async function openModal(workId) {
+      const modal = document.getElementById('project-modal');
+      const content = document.getElementById('modal-content');
+      const item = works.find((w) => w.id === workId);
+      if (!modal || !content || !item) return;
+
+      content.innerHTML = `
+        <div class="space-y-6">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-primary"></span>
+            <span class="text-[11px] font-bold text-primary-dark dark:text-primary uppercase mono tracking-widest">${escapeHtml(item.category)}</span>
+          </div>
+
+          <h3 class="text-3xl font-bold text-slate-900 dark:text-white">${escapeHtml(item.title)}</h3>
+          <p class="text-slate-500 dark:text-slate-400 leading-relaxed">${escapeHtml(item.content)}</p>
+
+          <div class="pt-4 flex flex-wrap gap-2">
+            ${item.tags
+              .map(
+                (tag) =>
+                  `<span class="px-3 py-1 bg-slate-100 dark:bg-navy-950 text-[10px] text-slate-500 dark:text-slate-300 rounded-lg">#${escapeHtml(tag)}</span>`
+              )
+              .join('')}
+          </div>
+
+          <div class="pt-6 border-t border-slate-100 dark:border-navy-800">
+            <h4 class="text-sm font-semibold mb-3">이미지 갤러리 (클릭 시 확대)</h4>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3" id="modal-gallery"></div>
+            <p class="mt-3 text-xs text-slate-400">폴더 규칙: assets/works/${item.id}/01.jpg, 02.jpg, 03.jpg … (숫자 파일명만 넣으면 자동 반영)</p>
+          </div>
+
+          <div class="pt-6 border-t border-slate-100 dark:border-navy-800">
+            <h4 class="text-sm font-semibold mb-3">프로젝트 PDF</h4>
+            <div id="pdf-wrap" class="w-full h-[60vh] rounded-xl overflow-hidden border border-slate-200 dark:border-navy-800 bg-slate-50 dark:bg-navy-950 flex items-center justify-center">
+              <span class="text-xs text-slate-400">PDF 업로드: assets/works/${item.id}/project.pdf</span>
+            </div>
+            <div class="mt-3 flex gap-3">
+              <a id="pdf-open" href="#" target="_blank" class="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-primary">새 탭으로 열기</a>
+              <a id="pdf-download" href="#" download class="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-primary">PDF 다운로드</a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const gallery = content.querySelector('#modal-gallery');
+
+      // 이미지 자동 로드: 01~30 (jpg/png/webp 중 첫 번째로 존재하는 파일을 사용)
+      // 이미지 자동 로드: 01부터 "연속"으로 로드 (중간 번호가 비면 탐색 종료)
+      const MAX_IMAGES = 30;
+      let loadedAny = false;
+
+      for (let i = 1; i <= MAX_IMAGES; i++) {
+        const num = String(i).padStart(2, '0');
+        const base = `assets/works/${item.id}/${num}`;
+
+        // eslint-disable-next-line no-await-in-loop
+        const found = await loadFirstExistingImage([`${base}.jpg`, `${base}.png`, `${base}.webp`]);
+
+        // ✅ 연속 규칙:
+        // - 01부터 시작해서 "처음으로 없는 번호"가 나오면 이후는 더 이상 시도하지 않고 종료
+        if (!found) {
+          if (i === 1) {
+            // 01 자체가 없으면 아무것도 없다고 보고 종료
+            break;
+          }
+          // 01은 있고, 중간에 비면(예: 05 없음) 그 시점에서 종료
+          break;
+        }
+
+        loadedAny = true;
+
+        const img = document.createElement('img');
+        img.src = found;
+        img.className = 'w-full h-40 object-cover rounded-lg border border-slate-200 dark:border-navy-800 cursor-zoom-in';
+        img.loading = 'lazy';
+        img.alt = `${escapeHtml(item.title)} 이미지 ${num}`;
+        img.addEventListener('click', () => openLightbox(found));
+        gallery.appendChild(img);
+      }
+
+      // (선택) 이미지가 하나도 없을 때 안내 문구 추가
+      if (!loadedAny && gallery) {
+        gallery.innerHTML = `
+          <div class="col-span-full text-xs text-slate-400">
+            이미지 업로드: <span class="mono">assets/works/${item.id}/01.jpg</span> (또는 01.png / 01.webp)
+          </div>
+        `;
+      }
+
+      // PDF 자동 로드 (project.pdf 있으면 iframe으로 표시)
+      const pdfUrl = `assets/works/${item.id}/project.pdf`;
+      const pdfWrap = content.querySelector('#pdf-wrap');
+      const pdfOpen = content.querySelector('#pdf-open');
+      const pdfDownload = content.querySelector('#pdf-download');
+
+      // Some static hosts may not support HEAD; fallback to GET.
+      fetch(pdfUrl, { method: 'HEAD' })
+        .catch(() => fetch(pdfUrl, { method: 'GET' }))
+        .then((res) => {
+          if (!res || !res.ok) throw new Error('no pdf');
+          const iframe = document.createElement('iframe');
+          iframe.src = pdfUrl;
+          iframe.className = 'w-full h-full';
+          iframe.loading = 'lazy';
+          pdfWrap.innerHTML = '';
+          pdfWrap.appendChild(iframe);
+          pdfOpen.href = pdfUrl;
+          pdfDownload.href = pdfUrl;
+        })
+        .catch(() => {
+          pdfOpen.removeAttribute('href');
+          pdfDownload.removeAttribute('href');
+        });
+
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    window.closeModal = () => {
+      const modal = document.getElementById('project-modal');
+      if (modal) modal.style.display = 'none';
+      closeLightbox();
+      document.body.style.overflow = 'auto';
+    };
+
+    // Alias for inline handlers (onclick="closeModal()")
+    function closeModal() {
+      window.closeModal();
+    }
+
+    // =========================
+    // Boot
+    // =========================
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        // ESC: close lightbox first, then modal
+        closeLightbox();
+        closeModal();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyInitialTheme();
+
+      const toggle = document.getElementById('dark-mode-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', () => {
+          document.documentElement.classList.toggle('dark');
+          localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        });
+      }
+
+      updateSlider();
+      renderExperience();
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add('visible');
+          });
+        },
+        { threshold: 0.1 }
+      );
+
+      document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+      lucide.createIcons();
+
+      // =========================
+      // Minimal "test cases" (runtime sanity checks)
+      // =========================
+      console.assert(typeof updateSlider === 'function', 'updateSlider should be a function');
+      console.assert(typeof openModal === 'function', 'openModal should be a function');
+      console.assert(typeof closeModal === 'function', 'closeModal should be a function');
+      console.assert(document.getElementById('slider-viewport'), '#slider-viewport should exist');
+      console.assert(document.querySelectorAll('.work-card').length === works.length, 'Should render one card per work');
+
+      // Thumbnail convention test
+      const firstThumb = document.querySelector('.work-card img');
+      console.assert(firstThumb && firstThumb.getAttribute('src')?.includes('/01.jpg'), 'Thumbnail should try /01.jpg first');
+
+      // Added: lightbox elements exist
+      console.assert(document.getElementById('lightbox'), '#lightbox should exist');
+      console.assert(document.getElementById('lightbox-img'), '#lightbox-img should exist');
+
+      // open/close modal should not throw
+      try {
+        openModal(works[0].id);
+        closeModal();
+        console.assert(true, 'Modal open/close OK');
+      } catch (err) {
+        console.error('Modal test failed:', err);
+      }
+
+      // Added: async modal open (await) should not throw
+      (async () => {
+        try {
+          await openModal(works[0].id);
+          closeModal();
+          console.assert(true, 'Modal async open/close OK');
+        } catch (err) {
+          console.error('Modal async test failed:', err);
+        }
+      })();
+    });
+  </script>
+</body>
+</html>
